@@ -34,6 +34,18 @@ async function parseResponse<T>(response: Response): Promise<T> {
   return response.json();
 }
 
+export async function registerUser(email: string, password: string): Promise<MessageResponse> {
+  const response = await fetch(`${API_URL}/auth/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ email, password })
+  });
+
+  return parseResponse<MessageResponse>(response);
+}
+
 export async function loginUser(email: string, password: string): Promise<LoginResponse> {
   const response = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
