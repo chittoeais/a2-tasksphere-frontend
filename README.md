@@ -1,2 +1,2 @@
-# a2-tasksphere-frontend
+# tasksphere-frontend
 React App for the front-end application.
