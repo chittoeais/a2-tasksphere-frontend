@@ -21,6 +21,8 @@ type MessageResponse = {
   message: string;
 };
 
+type UpdateTaskPayload = Partial<Pick<Task, "title" | "description" | "status">>;
+
 async function parseResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     let message = "Request failed";
@@ -34,6 +36,13 @@ async function parseResponse<T>(response: Response): Promise<T> {
   }
 
   return response.json();
+}
+
+function authHeaders(token: string): HeadersInit {
+  return {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json"
+  };
 }
 
 export async function registerUser(email: string, password: string): Promise<MessageResponse> {
@@ -70,4 +79,34 @@ export async function logoutUser(): Promise<MessageResponse> {
   });
 
   return parseResponse<MessageResponse>(response);
+}
+
+export async function listTasks(token: string): Promise<Task[]> {
+  const response = await fetch(`${API_URL}/tasks`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  return parseResponse<Task[]>(response);
+}
+
+export async function createTask(token: string, title: string, description: string): Promise<Task> {
+  const response = await fetch(`${API_URL}/tasks`, {
+    method: "POST",
+    headers: authHeaders(token),
+    body: JSON.stringify({ title, description })
+  });
+
+  return parseResponse<Task>(response);
+}
+
+export async function updateTask(token: string, id: string, data: UpdateTaskPayload): Promise<Task> {
+  const response = await fetch(`${API_URL}/tasks/${id}`, {
+    method: "PUT",
+    headers: authHeaders(token),
+    body: JSON.stringify(data)
+  });
+
+  return parseResponse<Task>(response);
 }
