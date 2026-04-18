@@ -1,6 +1,6 @@
 import { useAuth } from "./auth/AuthContext";
 
-const API_URL = (window.API_URL || "http://localhost:8000").replace(/\/$/, "");
+const API_URL = (import.meta.env.VITE_API_URL || window.API_URL || "http://localhost:8000").replace(/\/$/, "");
 
 export type TaskStatus = "To Do" | "In Progress" | "Completed";
 
