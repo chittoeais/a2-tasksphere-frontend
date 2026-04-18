@@ -21,6 +21,8 @@ type MessageResponse = {
   message: string;
 };
 
+type UpdateTaskPayload = Partial<Pick<Task, "title" | "description" | "status">>;
+
 async function parseResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     let message = "Request failed";
@@ -94,6 +96,16 @@ export async function createTask(token: string, title: string, description: stri
     method: "POST",
     headers: authHeaders(token),
     body: JSON.stringify({ title, description })
+  });
+
+  return parseResponse<Task>(response);
+}
+
+export async function updateTask(token: string, id: string, data: UpdateTaskPayload): Promise<Task> {
+  const response = await fetch(`${API_URL}/tasks/${id}`, {
+    method: "PUT",
+    headers: authHeaders(token),
+    body: JSON.stringify(data)
   });
 
   return parseResponse<Task>(response);
