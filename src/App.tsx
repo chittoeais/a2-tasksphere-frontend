@@ -4,6 +4,7 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import TaskListPage from "./pages/TaskListPage";
+import TaskCreatePage from "./pages/TaskCreatePage";
 
 export default function App() {
   return (
@@ -18,6 +19,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <TaskListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tasks/create"
+          element={
+            <ProtectedRoute>
+              <TaskCreatePage />
             </ProtectedRoute>
           }
         />
