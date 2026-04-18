@@ -3,18 +3,20 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import TaskListPage from "./TaskListPage";
 import { useAuth } from "../auth/AuthContext";
-import { listTasks } from "../api";
+import { deleteTask, listTasks } from "../api";
 
 vi.mock("../auth/AuthContext", () => ({
   useAuth: vi.fn()
 }));
 
 vi.mock("../api", () => ({
-  listTasks: vi.fn()
+  listTasks: vi.fn(),
+  deleteTask: vi.fn()
 }));
 
 const mockedUseAuth = vi.mocked(useAuth);
 const mockedListTasks = vi.mocked(listTasks);
+const mockedDeleteTask = vi.mocked(deleteTask);
 
 function createAuthValue(
   overrides: Partial<ReturnType<typeof useAuth>> = {}
@@ -43,6 +45,7 @@ describe("TaskListPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockedUseAuth.mockReturnValue(createAuthValue());
+    mockedDeleteTask.mockResolvedValue({ message: "Deleted" });
   });
 
   it("loads and displays tasks", async () => {
@@ -91,6 +94,41 @@ describe("TaskListPage", () => {
 
     await waitFor(() => {
       expect(mockedListTasks).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  it("deletes a task from the list", async () => {
+    mockedListTasks.mockResolvedValue([
+      {
+        id: "task-1",
+        title: "Delete me",
+        description: "Temporary task",
+        status: "To Do",
+        owner_email: "user@example.com"
+      },
+      {
+        id: "task-2",
+        title: "Keep me",
+        description: "Persistent task",
+        status: "In Progress",
+        owner_email: "user@example.com"
+      }
+    ]);
+
+    renderPage();
+
+    expect(await screen.findByText("Delete me")).toBeTruthy();
+
+    const deleteButtons = screen.getAllByRole("button", { name: "Delete" });
+    fireEvent.click(deleteButtons[0]);
+
+    await waitFor(() => {
+      expect(mockedDeleteTask).toHaveBeenCalledWith("token-123", "task-1");
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByText("Delete me")).toBeNull();
+      expect(screen.getByText("Keep me")).toBeTruthy();
     });
   });
 });

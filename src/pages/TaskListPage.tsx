@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { listTasks, type Task } from "../api";
+import { deleteTask, listTasks, type Task } from "../api";
 import { useAuth } from "../auth/AuthContext";
 
 export default function TaskListPage() {
@@ -8,6 +8,7 @@ export default function TaskListPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
 
   const loadTasks = useCallback(async () => {
     if (!token) return;
@@ -29,6 +30,23 @@ export default function TaskListPage() {
   useEffect(() => {
     loadTasks();
   }, [loadTasks]);
+
+  async function handleDelete(id: string) {
+    if (!token) return;
+
+    setDeletingTaskId(id);
+    setError("");
+
+    try {
+      await deleteTask(token, id);
+      setTasks((currentTasks) => currentTasks.filter((task) => task.id !== id));
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to delete task";
+      setError(message);
+    } finally {
+      setDeletingTaskId(null);
+    }
+  }
 
   if (isLoading) {
     return (
@@ -68,6 +86,14 @@ export default function TaskListPage() {
               <Link to={`/tasks/edit/${task.id}`}>
                 <button type="button">Update</button>
               </Link>
+
+              <button
+                type="button"
+                onClick={() => handleDelete(task.id)}
+                disabled={deletingTaskId === task.id}
+              >
+                {deletingTaskId === task.id ? "Deleting..." : "Delete"}
+              </button>
             </div>
           </div>
         ))
