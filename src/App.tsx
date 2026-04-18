@@ -5,6 +5,7 @@ import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import TaskListPage from "./pages/TaskListPage";
 import TaskCreatePage from "./pages/TaskCreatePage";
+import TaskEditPage from "./pages/TaskEditPage";
 
 export default function App() {
   return (
@@ -27,6 +28,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <TaskCreatePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tasks/edit/:id"
+          element={
+            <ProtectedRoute>
+              <TaskEditPage />
             </ProtectedRoute>
           }
         />
