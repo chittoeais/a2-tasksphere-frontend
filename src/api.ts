@@ -55,10 +55,7 @@ export async function loginUser(email: string, password: string): Promise<LoginR
     body: JSON.stringify({ email, password })
   });
 
-  return parseResponse<LoginResponse>(response).catch(() => ({
-    access_token: "",
-    token_type: ""
-  }));
+  return parseResponse<LoginResponse>(response);
 }
 
 export async function logoutUser(): Promise<MessageResponse> {
