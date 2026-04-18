@@ -111,3 +111,13 @@ export async function updateTask(token: string, id: string, data: UpdateTaskPayl
   return parseResponse<Task>(response);
 }
 
+export async function deleteTask(token: string, id: string): Promise<MessageResponse> {
+  const response = await fetch(`${API_URL}/tasks/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  return parseResponse<MessageResponse>(response);
+}
