@@ -1,3 +1,5 @@
+import { useAuth } from "./auth/AuthContext";
+
 const API_URL = (window.API_URL || "http://localhost:8000").replace(/\/$/, "");
 
 export type TaskStatus = "To Do" | "In Progress" | "Completed";
@@ -59,11 +61,13 @@ export async function loginUser(email: string, password: string): Promise<LoginR
 }
 
 export async function logoutUser(): Promise<MessageResponse> {
+  const { token } = useAuth();
   const response = await fetch(`${API_URL}/auth/logout`, {
-    method: "POST"
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
   });
 
-  return parseResponse<MessageResponse>(response).catch(() => ({
-    message: ""
-  }));
+  return parseResponse<MessageResponse>(response);
 }
