@@ -28,7 +28,7 @@ async function parseResponse<T>(response: Response): Promise<T> {
     let message = "Request failed";
     try {
       const data = await response.json();
-      message = data.detail || data.message || JSON.stringify(data);
+      message = data.detail || data.message || data.detail.msg || JSON.stringify(data);
     } catch {
       message = await response.text();
     }
