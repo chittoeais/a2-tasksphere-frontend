@@ -28,7 +28,18 @@ async function parseResponse<T>(response: Response): Promise<T> {
     let message = "Request failed";
     try {
       const data = await response.json();
-      message = data.detail || data.message || data.detail.msg || JSON.stringify(data);
+      
+      if (Array.isArray(data.detail) && data.detail.length > 0) {
+        message = data.detail
+          .map((item: { msg?: string; ctx?: { reason?: string } }) => item.msg || item.ctx?.reason)
+          .filter(Boolean)
+          .join(", ");
+      } else if (typeof data.detail === "string") {
+        message = data.detail;
+      } else {
+        message = data.message || JSON.stringify(data);
+      }
+
     } catch {
       message = await response.text();
     }
